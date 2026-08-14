@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secret Hearts</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Georgia, serif;
+  background: #140f18;
+  color: #f8edf8;
+}
+
+button, input, select {
+  font: inherit;
+}
+
+.screen {
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.card {
+  width: 100%;
+  max-width: 560px;
+  background: #241a28;
+  border: 1px solid #654c68;
+  border-radius: 24px;
+  padding: 28px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+}
+
+.hidden {
+  display: none !important;
+}
+
+.logo {
+  text-align: center;
+  font-size: 52px;
+  margin-bottom: 4px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 42px;
+  margin: 0 0 8px;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+.subtitle {
+  text-align: center;
+  color: #cbb7cd;
+  margin-bottom: 30px;
+}
+
+label {
+  display: block;
+  margin: 18px 0 8px;
+  color: #d9c7da;
+}
+
+input, select {
+  width: 100%;
+  padding: 13px;
+  border: 1px solid #654c68;
+  border-radius: 12px;
+  background: #17121b;
+  color: white;
+  outline: none;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.option {
+  padding: 13px;
+  border: 1px solid #654c68;
+  border-radius: 12px;
+  background: #17121b;
+  text-align: center;
+  cursor: pointer;
+}
+
+.option.selected {
+  background: #704b70;
+  border-color: #d6a9d3;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 20px;
+  border: 0;
+  border-radius: 13px;
+  background: #a96ba2;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #39283d;
+  border: 1px solid #654c68;
+}
+
+.info {
+  background: #17121b;
+  border-radius: 15px;
+  padding: 16px;
+  margin: 14px 0;
+  line-height: 1.7;
+}
+
+.stat {
+  margin: 10px 0;
+}
+
+.bar {
+  height: 8px;
+  background: #392b3c;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-top: 5px;
+}
+
+.fill {
+  height: 100%;
+  background: #b978b1;
+  width: 50%;
+}
+
+.event {
+  padding: 18px;
+  background: #2d202f;
+  border-radius: 15px;
+  margin-top: 18px;
+  line-height: 1.6;
+}
+
+.small {
+  color: #bda9bf;
+  font-size: 14px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- CHARACTER CREATION -->
+
+<div id="creationScreen" class="screen">
+<div class="card">
+
+<div class="logo">♥</div>
+<h1>Secret Hearts</h1>
+
+<p class="subtitle">
+Everyone has a life. Everyone has secrets.
+</p>
+
+<label>Your name</label>
+<input id="name" placeholder="Enter your name">
+
+<label>Gender</label>
+
+<div class="options">
+
+<div class="option" onclick="chooseGender(this,'Female')">
+Female
+</div>
+
+<div class="option" onclick="chooseGender(this,'Male')">
+Male
+</div>
+
+<div class="option" onclick="chooseGender(this,'Non-binary')">
+Non-binary
+</div>
+
+<div class="option" onclick="chooseGender(this,'Custom')">
+Custom
+</div>
+
+</div>
+
+<div id="customGenderBox" class="hidden">
+<label>Your gender</label>
+<input id="customGender" placeholder="Enter your gender">
+</div>
+
+<label>Where does your story take place?</label>
+
+<select id="location">
+<option>New York</option>
+<option>London</option>
+<option>Paris</option>
+<option>Los Angeles</option>
+<option>Seoul</option>
+<option>Tokyo</option>
+<option>Mumbai</option>
+<option>A fictional city</option>
+</select>
+
+<label>Choose your background</label>
+
+<select id="background">
+<option value="ordinary">Ordinary Life</option>
+<option value="wealthy">Wealthy Family</option>
+<option value="royalty">Royal Family</option>
+<option value="celebrity">Celebrity</option>
+<option value="political">Powerful Family</option>
+</select>
+
+<button onclick="beginStory()">
+Begin My Story
+</button>
+
+</div>
+</div>
+
+
+<!-- GAME -->
+
+<div id="gameScreen" class="screen hidden">
+<div class="card">
+
+<div class="logo">♥</div>
+
+<h1 id="gameTitle">Secret Hearts</h1>
+
+<p id="intro"></p>
+
+<div class="info">
+<strong>Your Life</strong>
+
+<br><br>
+
+Name:
+<span id="playerName"></span>
+
+<br>
+
+Gender:
+<span id="playerGender"></span>
+
+<br>
+
+Location:
+<span id="playerLocation"></span>
+
+<br>
+
+Background:
+<span id="playerBackground"></span>
+</div>
+
+
+<div class="info">
+
+<strong>Your Stats</strong>
+
+<div class="stat">
+Reputation
+<div class="bar">
+<div id="reputationBar" class="fill"></div>
+</div>
+</div>
+
+<div class="stat">
+Money
+<div class="bar">
+<div id="moneyBar" class="fill"></div>
+</div>
+</div>
+
+<div class="stat">
+Relationships
+<div class="bar">
+<div id="relationshipBar" class="fill"></div>
+</div>
+</div>
+
+</div>
+
+
+<div class="info">
+
+<strong>Someone has entered your life...</strong>
+
+<br><br>
+
+<b id="npcName"></b>
+
+<br>
+
+<span id="npcDescription"></span>
+
+</div>
+
+
+<div id="eventBox" class="event">
+
+<h2 id="eventTitle"></h2>
+
+<p id="eventText"></p>
+
+<button onclick="makeChoice(1)" id="choiceOne"></button>
+
+<button onclick="makeChoice(2)" id="choiceTwo" class="secondary"></button>
+
+</div>
+
+</div>
+</div>
+
+
+<script>
+
+let player = {
+  name: "",
+  gender: "",
+  location: "",
+  background: "",
+  reputation: 50,
+  money: 50,
+  relationships: 50
+};
+
+let npc = {
+  name: "",
+  description: ""
+};
+
+let selectedGender = "";
+
+const npcNames = [
+  "Alexander Bennett",
+  "Elena Moreau",
+  "Julian Carter",
+  "Vivienne Laurent",
+  "Adrian Hayes",
+  "Amelia Sinclair",
+  "Nikolai Volkov",
+  "Sofia Bennett"
+];
+
+function chooseGender(element, gender) {
+
+  document.querySelectorAll(".option").forEach(option => {
+    option.classList.remove("selected");
+  });
+
+  element.classList.add("selected");
+
+  selectedGender = gender;
+
+  if (gender === "Custom") {
+    document.getElementById("customGenderBox")
+      .classList.remove("hidden");
+  } else {
+    document.getElementById("customGenderBox")
+      .classList.add("hidden");
+  }
+}
+
+
+function beginStory() {
+
+  const name =
+    document.getElementById("name").value.trim();
+
+  if (!name) {
+    alert("Please enter your name.");
+    return;
+  }
+
+  if (!selectedGender) {
+    alert("Please choose your gender.");
+    return;
+  }
+
+  if (selectedGender === "Custom") {
+
+    const custom =
+      document.getElementById("customGender").value.trim();
+
+    if (!custom) {
+      alert("Please enter your gender.");
+      return;
+    }
+
+    player.gender = custom;
+
+  } else {
+
+    player.gender = selectedGender;
+
+  }
+
+  player.name = name;
+
+  player.location =
+    document.getElementById("location").value;
+
+  player.background =
+    document.getElementById("background").value;
+
+  npc.name =
+    npcNames[Math.floor(Math.random() * npcNames.length)];
+
+  npc.description =
+    createNPCDescription();
+
+  document.getElementById("creationScreen")
+    .classList.add("hidden");
+
+  document.getElementById("gameScreen")
+    .classList.remove("hidden");
+
+  updateGame();
+
+  firstEvent();
+}
+
+
+function createNPCDescription() {
+
+  const descriptions = [
+
+    "They seem charming, but there is something strangely guarded about them.",
+
+    "Everyone seems to know their name. You aren't sure why yet.",
+
+    "They have a reputation for getting involved in complicated relationships.",
+
+    "They appear friendly, although rumors about them are already circulating.",
+
+    "They seem completely ordinary. Somehow, that makes you suspicious."
+
+  ];
+
+  return descriptions[
+    Math.floor(Math.random() * descriptions.length)
+  ];
+}
+
+
+function updateGame() {
+
+  document.getElementById("playerName")
+    .textContent = player.name;
+
+  document.getElementById("playerGender")
+    .textContent = player.gender;
+
+  document.getElementById("playerLocation")
+    .textContent = player.location;
+
+  document.getElementById("playerBackground")
+    .textContent = formatBackground(player.background);
+
+  document.getElementById("npcName")
+    .textContent = npc.name;
+
+  document.getElementById("npcDescription")
+    .textContent = npc.description;
+
+  document.getElementById("reputationBar")
+    .style.width = player.reputation + "%";
+
+  document.getElementById("moneyBar")
+    .style.width = player.money + "%";
+
+  document.getElementById("relationshipBar")
+    .style.width = player.relationships + "%";
+}
+
+
+function formatBackground(background) {
+
+  const names = {
+    ordinary: "Ordinary Life",
+    wealthy: "Wealthy Family",
+    royalty: "Royal Family",
+    celebrity: "Celebrity",
+    political: "Powerful Family"
+  };
+
+  return names[background];
+}
+
+
+function firstEvent() {
+
+  document.getElementById("eventTitle")
+    .textContent = "A Strange Encounter";
+
+  document.getElementById("eventText")
+    .textContent =
+    npc.name +
+    " approaches you at an unexpected moment. " +
+    "They smile as if they already know something about you.";
+
+  document.getElementById("choiceOne")
+    .textContent = "Talk to them";
+
+  document.getElementById("choiceTwo")
+    .textContent = "Walk away";
+
+}
+
+
+function makeChoice(choice) {
+
+  if (choice === 1) {
+
+    player.relationships += 10;
+    player.reputation += 3;
+
+    if (player.relationships > 100)
+      player.relationships = 100;
+
+    if (player.reputation > 100)
+      player.reputation = 100;
+
+    document.getElementById("eventTitle")
+      .textContent = "An Interesting Conversation";
+
+    document.getElementById("eventText")
+      .textContent =
+      "You decide to talk. The conversation lasts much longer than expected. " +
+      npc.name +
+      " seems interested in getting to know you.";
+
+  }
+
+  else {
+
+    player.reputation -= 2;
+
+    if (player.reputation < 0)
+      player.reputation = 0;
+
+    document.getElementById("eventTitle")
+      .textContent = "You Walk Away";
+
+    document.getElementById("eventText")
+      .textContent =
+      "You leave without looking back. " +
+      "Unfortunately, you can't shake the feeling that you'll see " +
+      npc.name +
+      " again.";
+
+  }
+
+  document.getElementById("choiceOne")
+    .textContent = "Continue";
+
+  document.getElementById("choiceTwo")
+    .textContent = "Continue";
+
+  document.getElementById("choiceOne")
+    .onclick = () => randomEvent();
+
+  document.getElementById("choiceTwo")
+    .onclick = () => randomEvent();
+
+  updateGame();
+}
+
+
+function randomEvent() {
+
+  const events = [
+
+    {
+      title: "A Rumor",
+      text:
+      "You overhear two people talking about someone close to you. " +
+      "You aren't sure whether the rumor is true."
+    },
+
+    {
+      title: "An Invitation",
+      text:
+      "An unexpected invitation arrives. Accepting it could introduce you " +
+      "to people you never expected to meet."
+    },
+
+    {
+      title: "A Secret",
+      text:
+      "You discover that someone in your circle has been hiding something."
+    },
+
+    {
+      title: "A Familiar Face",
+      text:
+      "Someone from your past appears in your life again."
+    }
+
+  ];
+
+  const event =
+    events[Math.floor(Math.random() * events.length)];
+
+  document.getElementById("eventTitle")
+    .textContent = event.title;
+
+  document.getElementById("eventText")
+    .textContent = event.text;
+
+  document.getElementById("choiceOne")
+    .textContent = "Investigate";
+
+  document.getElementById("choiceTwo")
+    .textContent = "Ignore it";
+
+  document.getElementById("choiceOne")
+    .onclick = () => investigate();
+
+  document.getElementById("choiceTwo")
+    .onclick = () => ignore();
+
+}
+
+
+function investigate() {
+
+  player.reputation += 5;
+  player.relationships += 3;
+
+  if (player.reputation > 100)
+    player.reputation = 100;
+
+  if (player.relationships > 100)
+    player.relationships = 100;
+
+  document.getElementById("eventTitle")
+    .textContent = "You Investigate";
+
+  document.getElementById("eventText")
+    .textContent =
+    "You decide that knowing the truth is worth the risk. " +
+    "What you discover may change how you see someone."
+
+  document.getElementById("choiceOne")
+    .textContent = "Continue";
+
+  document.getElementById("choiceTwo")
+    .textContent = "Continue";
+
+  document.getElementById("choiceOne")
+    .onclick = () => randomEvent();
+
+  document.getElementById("choiceTwo")
+    .onclick = () => randomEvent();
+
+  updateGame();
+}
+
+
+function ignore() {
+
+  player.relationships -= 3;
+
+  if (player.relationships < 0)
+    player.relationships = 0;
+
+  document.getElementById("eventTitle")
+    .textContent = "You Let It Go";
+
+  document.getElementById("eventText")
+    .textContent =
+    "You decide not to involve yourself. Sometimes ignorance really is easier.";
+
+  document.getElementById("choiceOne")
+    .textContent = "Continue";
+
+  document.getElementById("choiceTwo")
+    .textContent = "Continue";
+
+  document.getElementById("choiceOne")
+    .onclick = () => randomEvent();
+
+  document.getElementById("choiceTwo")
+    .onclick = () => randomEvent();
+
+  updateGame();
+}
+
+</script>
+
+</body>
+</html>
